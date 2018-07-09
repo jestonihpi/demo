@@ -23,7 +23,7 @@
 
                             <div class="form-group">
                                 <label for="event-name">Event </label>
-                                <input type="text" class="form-control" name="event_name" id="event-name" >
+                                <input type="text" class="form-control" name="event_name" id="event-name"   autocomplete="off">
                             </div>
                                             
                             <div class="row">
@@ -72,8 +72,18 @@
                             <div class="form-group">
                                 <button type="submit" class="btn btn-primary">Submit</button>
                             </div>
+
+                            <hr>                           
                             
                             {!! Form::close() !!}
+
+                            <div>
+                                <ul class="list-group">
+                                    @foreach($events as $event)
+                                    <li class="list-group-item"> <a href="{{ route('view' , $event->id)}}">{{ $event->name}} - {{$event->created_at->diffForHumans()}}</a></li>
+                                    @endforeach
+                                </ul>
+                            </div>
                             
                         </div>
 
@@ -89,6 +99,7 @@
         </div>
     </div>
 </div>
+
 @endsection
 
 @section('addTopCSS')

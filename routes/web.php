@@ -21,8 +21,12 @@ Auth::routes();
 
 Route::group(['prefix' => 'dashboard',  'middleware' => 'auth'], function()
 {
-    Route::get('home', 'HomeController@index')->name('home');
-    Route::post('save','HomeController@save')->name('save');
+    Route::get('index', 'HomeController@index')->name('home');
+    Route::group(['prefix'=>'events'],function(){
+        Route::post('save','HomeController@save')->name('save');
+        Route::get('view/{id}','HomeController@view')->name('view');
+    });
+   
     
 });
 

@@ -10,6 +10,12 @@ use App\Events;
 
 use Auth;
 
+use DateTime;
+
+use DateInterval;
+
+use DatePeriod;
+
 class HomeController extends Controller
 {
     /**
@@ -29,7 +35,8 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        
+        return view('home' ,['events' => Events::where('user_id',Auth::id() )->orderBy('id','desc')->get() ]  );
     }
 
     public function save(Request $request){
@@ -50,6 +57,19 @@ class HomeController extends Controller
         return redirect()->route('home')->with('status', 'Event saved!');
 
 
+
+    }
+
+    public function view(Request $request){
+
+        $event = Events::find($request->id);
+        $start    = new DateTime($event->start);
+        $end      = (new DateTime($event->end))->modify('+1 day');
+        $interval = new DateInterval('P1D');
+        $period   = new DatePeriod($start, $interval, $end);
+        
+        
+        return view('view' ,['period' => $period ,'details' => $event ,'selected_days' => json_decode($event->days) ]  );
 
     }
 
