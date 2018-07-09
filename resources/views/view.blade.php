@@ -28,6 +28,7 @@
                             <p>Author : {{ Auth::user()->name}}</p>
                             <p>Start : {{ $details->start}}</p>
                             <p>End : {{ $details->end }}</p>
+                            <p><a href="{{ route('home') }}"> Dashboard</a></p>
                         </div>
                         <div class="col-md-7">
                             <div id="results" >
