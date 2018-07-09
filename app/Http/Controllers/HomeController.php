@@ -16,6 +16,8 @@ use DateInterval;
 
 use DatePeriod;
 
+use Response;
+
 class HomeController extends Controller
 {
     /**
@@ -53,8 +55,9 @@ class HomeController extends Controller
         $event->days = json_encode($request->days);
         
         $event->save();
-
-        return redirect()->route('home')->with('status', 'Event saved!');
+        return Response::json([
+            'message'=>'Event added!', 'prepend_event_html' => "<a ' href='".route('view' , $event->id)."' class='view-modal'>".$request->event_name . "- ".$event->created_at->diffForHumans() ."</a>"]); 
+       # return redirect()->route('home')->with('status', 'Event saved!');
 
 
 
@@ -69,7 +72,9 @@ class HomeController extends Controller
         $period   = new DatePeriod($start, $interval, $end);
         
         
-        return view('view' ,['period' => $period ,'details' => $event ,'selected_days' => json_decode($event->days) ]  );
+        $html = view('view' ,['period' => $period ,'details' => $event ,'selected_days' => json_decode($event->days) ]  )->renderSections()['content'];;
+
+        return Response::json(['html' => $html , 'title' => $event->name]);
 
     }
 

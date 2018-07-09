@@ -9,16 +9,19 @@
                 <div class="card-header">Calendar</div>
 
                 <div class="card-body">
-                 @if (session('status'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('status') }}
-                        </div>
+                    <div class="alert alert-success " style="display:none" id="success-alert" role="alert">
+                        Event saved!
+                    </div>
+                     @if (session('status'))
+                    <div class="alert alert-success" role="alert">
+                        {{ session('status') }}
+                    </div>
                     @endif
                    
                    <div class="row">
                   
                         <div class="col-md-5">
-                            {!! Form::open(['route' => 'save']) !!}
+                            {!! Form::open(['route' => 'save', 'id' => 'event-form']) !!}
 
 
                             <div class="form-group">
@@ -78,9 +81,9 @@
                             {!! Form::close() !!}
 
                             <div>
-                                <ul class="list-group">
+                                <ul class="list-group" id="event-listing">
                                     @foreach($events as $event)
-                                    <li class="list-group-item"> <a href="{{ route('view' , $event->id)}}">{{ $event->name}} - {{$event->created_at->diffForHumans()}}</a></li>
+                                    <li class="list-group-item"> <a href="{{ route('view' , $event->id)}}" class="view-modal">{{ $event->name}} - {{$event->created_at->diffForHumans()}}</a></li>
                                     @endforeach
                                 </ul>
                             </div>
@@ -100,6 +103,28 @@
     </div>
 </div>
 
+
+<!-- Modal -->
+<div class="modal fade" id="event-modal" tabindex="-1" role="dialog" aria-labelledby="event-modal" aria-hidden="true">
+  <div class="modal-dialog" role="">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="event-modal-title"> -- </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+         ---
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 @endsection
 
 @section('addTopCSS')
@@ -112,6 +137,8 @@
 @section('addBottomJS')
 <script>
 $( function() {
+
+    //datepicker initialization and configs.
 
     $( "#date-to " ).datepicker({
         dateFormat: 'yy-mm-dd' 
@@ -197,13 +224,61 @@ $( function() {
 
     });
 
+
+
+    // form ajax
+
+    $('#event-form').submit(function(e){
+
+      e.preventDefault();
+        _data = $(this).serializeArray();
+        $.ajax({
+                type: "POST",
+                url:'{{ route('save')}}',
+                data: _data,
+                success: function( msg ) {
+                    $('#event-listing').prepend("<li class='list-group-item' >"+msg.prepend_event_html+'</li>');
+                    //reset form and results once done
+                    $('#results').html('');
+                    $('#event-form')[0].reset();
+
+                    $("#success-alert").fadeTo(2000, 500).slideUp(500, function(){
+                        $("#success-alert").slideUp(500);
+                    });
+                }
+            });
+
+    });
+
+    $(document).on('click','.view-modal', function(e){
+        //reset
+        e.preventDefault();
+        link = $(this);
+       
+        $('#event-modal #event-modal-title').html('---');
+        $('#event-modal .modal-body').html('---');
+
+        $.ajax({
+            type: "GET",
+            url: $(link).attr('href'),
+            success: function( result ) {
+
+                $('#event-modal #event-modal-title').html(result.title);
+                $('#event-modal .modal-body').html(result.html);
+                $('#event-modal').modal('show');
+            }
+        });
+
+    })
+
 } );
 </script>
 @endsection
 @section('addTopJS')
-<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="{{ asset('js/jquery-1.12.4.min.js') }}"></script>
+<script src="{{ asset('js/jquery-ui.min.js') }}"></script>
 <script src="{{ asset('js/jquery-dateformat.js') }}"></script>
+<script src="{{ asset('js/bootstrap.min.js') }}"></script>
 
 
 
