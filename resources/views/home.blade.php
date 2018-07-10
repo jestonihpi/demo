@@ -130,7 +130,7 @@
 @section('addTopCSS')
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <style>
- .result.active{background:green}
+ .result.active{background:#28c328}
 </style>
 @endsection
 
